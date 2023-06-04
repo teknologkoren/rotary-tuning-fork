@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "DYPlayerArduino.h"
 
 // Blue wire on rotary thingy
