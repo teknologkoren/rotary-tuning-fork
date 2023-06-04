@@ -120,6 +120,7 @@ void play_song(int index) {
 
 void setup() {
   Serial.begin(115200);
+  Serial.print("Setting up...");
   // put your setup code here, to run once:
   pinMode(LED_PIN, OUTPUT);
   pinMode(PULSES_PIN, INPUT_PULLUP);
@@ -127,6 +128,7 @@ void setup() {
   player.begin();
   player.setVolume(6); // 100% Volume
   delay(2000);
+  Serial.print("Setup finished.");
 }
 
 int state = 0;
@@ -155,15 +157,6 @@ void process_number(int number) {
 }
 
 void loop() {
-  // play_song(0);
-  // delay(3000);
-  // player.playSpecified(1);
-  // delay(3000);
-  // // Serial.begin(115200);
-  // // put your main code here, to run repeatedly:
-  int pulses = digitalRead(PULSES_PIN);
-  int enable = digitalRead(ENABLE_PIN);
-
   switch(state) {
     case 0:
       if (i_printed == 0) {
