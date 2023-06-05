@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include "DYPlayerArduino.h"
 
+#include "server.h"
+
 // Blue wire on rotary thingy
 #define PULSES_PIN 2
 
@@ -128,6 +130,7 @@ void setup() {
   player.begin();
   player.setVolume(6); // 100% Volume
   delay(2000);
+  setup_server();
   Serial.print("Setup finished.");
 }
 
