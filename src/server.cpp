@@ -37,6 +37,24 @@ void setup_server() {
       request->send(response);
   });
 
+  server.on("/api/play-notes", HTTP_GET, [](AsyncWebServerRequest *request) {
+    AsyncResponseStream *response =
+        request->beginResponseStream("application/json");
+    DynamicJsonDocument json(1024);
+
+    if (request->hasParam("notes")) {
+      AsyncWebParameter *p = request->getParam("notes");
+      json["status"] = "ok";
+      Serial.println(p->value());
+    } else {
+      json["status"] = "failure";
+      Serial.println("Did not get notes to play.");
+    }
+
+    serializeJson(json, *response);
+    request->send(response);
+  });
+
   // Start webserver
   server.begin();
 }

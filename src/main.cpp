@@ -122,7 +122,7 @@ void play_song(int index) {
 
 void setup() {
   Serial.begin(115200);
-  Serial.print("Setting up...");
+  Serial.println("Setting up...");
   // put your setup code here, to run once:
   pinMode(LED_PIN, OUTPUT);
   pinMode(PULSES_PIN, INPUT_PULLUP);
@@ -131,7 +131,7 @@ void setup() {
   player.setVolume(6); // 100% Volume
   delay(2000);
   setup_server();
-  Serial.print("Setup finished.");
+  Serial.println("Setup finished.");
 }
 
 int state = 0;
