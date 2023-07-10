@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "DYPlayerArduino.h"
 
-#include "dial.h"
+#include "input.h"
 #include "server.h"
 #include "songs.h"
 
@@ -11,7 +11,7 @@
 #define LED_PIN 17
 
 DY::Player player(&Serial2);
-Dial dial;
+Input input;
 
 void play_song(int index) {
   for(int i = 0; i < 5; i++) {
@@ -35,8 +35,8 @@ void setup() {
   player.begin();
   player.setVolume(15); // 100% Volume
   delay(2000);
-  // setup_server();
-  dial.setup();
+  setup_server();
+  input.setup();
   Serial.println("Setup finished.");
 }
 
@@ -51,8 +51,9 @@ void loop() {
     // Serial.println((int) player.checkPlayState());
   //   delay(1000);
   // }
-  int song = dial.loop();
+  int song = input.loop();
   if (song != -1) {
+    Serial.println(song);
     play_song(song);
   }
 }

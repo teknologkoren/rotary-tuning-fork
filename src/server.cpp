@@ -12,7 +12,7 @@ AsyncWebServer server(80);
 void setup_server() {
   // Connect Wifi, restart if not connecting
   // https://techoverflow.net/2021/01/21/how-to-fix-esp32-not-connecting-to-the-wifi-network/
-  WiFi.begin("some SSID", "some password");
+  WiFi.begin("SSID", "password");
   uint32_t notConnectedCounter = 0;
   while (WiFi.status() != WL_CONNECTED) {
       delay(100);

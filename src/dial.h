@@ -11,6 +11,7 @@ class Dial {
   void setup();
   int loop(); // Returns a number if one was entered, otherwise -1.
   void reset();
+  int get_state();
 
   private:
   int state = 0;

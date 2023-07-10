@@ -27,6 +27,10 @@ void Dial::reset() {
   d_var_2 = 0;
 }
 
+int Dial::get_state() {
+  return state;
+}
+
 int Dial::loop() {
   switch(state) {
     case 0:
@@ -43,7 +47,7 @@ int Dial::loop() {
 
       if (debounce(ENABLE_PIN, HIGH, d_var_2)) { // Dial came back
         state = 0;
-        Serial.print(n_of_pulses - 1);
+        // Serial.print(n_of_pulses - 1);
         return n_of_pulses - 1;
       }
     break;
@@ -54,12 +58,15 @@ int Dial::loop() {
 
       if (debounce(ENABLE_PIN, HIGH, d_var_2)) {
         state = 0;
-        Serial.print(n_of_pulses - 1);
+        // Serial.print(n_of_pulses - 1);
         return n_of_pulses - 1;
       }
     break;
   }
 
   delay(1);
-  return -1;
+  // if (Serial.available() > 0) {
+  //   return Serial.readStringUntil('\n').toInt();
+  // }
+  // return -1;
 }
