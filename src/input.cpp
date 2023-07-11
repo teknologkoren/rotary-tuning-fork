@@ -31,7 +31,7 @@ int Input::loop() {
 
   // If the user has not started dialing another digit for an amount of time,
   // return the entered number
-  if (timing_out && (millis() - last_digit_time > 1000)) {
+  if (timing_out && (millis() - last_digit_time > 2000)) {
     int result = current_number;
     reset();
     return result;

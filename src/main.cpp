@@ -1,29 +1,31 @@
 #include <Arduino.h>
-#include "DYPlayerArduino.h"
 
 #include "input.h"
+#include "player.h"
 #include "server.h"
 #include "songs.h"
+#include "ringer.h"
 
 
 #define RECIEVER_SWITCH_PIN 21
 
 #define LED_PIN 17
 
-DY::Player player(&Serial2);
+Player player;
 Input input;
+Ringer ringer;
 
-void play_song(int index) {
-  for(int i = 0; i < 5; i++) {
-    if (songs[index].notes[i] == -1) {
-      break;
+bool debounce(int pin, int state, int &d_var) {
+  if (digitalRead(pin) == state) {
+    d_var += 1;
+    if (d_var > DEBOUNCE_THRESHOLD) {
+      d_var = 0;
+      return true;
     }
-
-    player.playSpecified(songs[index].notes[i]);
-    while (player.checkPlayState() == DY::PlayState::Playing) {
-      delay(100);
-    }
+  } else {
+    d_var = 0;
   }
+  return false;
 }
 
 void setup() {
@@ -32,28 +34,98 @@ void setup() {
   // put your setup code here, to run once:
   pinMode(LED_PIN, OUTPUT);
   pinMode(RECIEVER_SWITCH_PIN, INPUT_PULLUP);
-  player.begin();
-  player.setVolume(15); // 100% Volume
   delay(2000);
-  setup_server();
+  // setup_server();
   input.setup();
+
+  // Setup ringing
+  ringer.setup();
+
   Serial.println("Setup finished.");
 }
 
-int accumulated_page;
-void process_number(int number) {
-  accumulated_page = accumulated_page * 10 + number;
-}
+/*
+  Main state variable.
+  0 - phone handle down, idle
+  1 - phone handle down, ringing
+  2 - phone handle up, waiting for input
+  3 - phone handle up, playing notes
+*/
+int main_state = 0;
+
+// HIGH = handle up
+// LOW = handle down
+int reciever_switch_debounce = 0;
 
 void loop() {
-  // Serial.println(digitalRead(RECIEVER_SWITCH_PIN));
-  // while (true) {
-    // Serial.println((int) player.checkPlayState());
-  //   delay(1000);
-  // }
-  int song = input.loop();
-  if (song != -1) {
-    Serial.println(song);
-    play_song(song);
+  switch (main_state) {
+    // Idle state - listen for handle up and network requests.
+    case 0: {
+      if (debounce(RECIEVER_SWITCH_PIN, HIGH, reciever_switch_debounce)) {
+        main_state = 2;
+        reciever_switch_debounce = 0;
+      }
+      break;
+    }
+
+    // Riiing!!   Riiing!!   Riiing!!
+    case 1: {
+      if (debounce(RECIEVER_SWITCH_PIN, HIGH, reciever_switch_debounce)) {
+        main_state = 2;
+        reciever_switch_debounce = 0;
+      }
+      bool ringer_timeout = ringer.loop();
+
+      // If ringing timeout reached, go back to idle
+      if (!ringer_timeout) {
+        main_state = 2;
+        reciever_switch_debounce = 0;
+      }
+      break;
+    }
+
+    // Wait for dial input or the handle to be put down again.
+    case 2: {
+      int song = input.loop();
+      if (song != -1) {
+        Serial.println();
+        Serial.println(song);
+
+        // Start playin'!
+        player.play_notes(songs[song].notes);
+        main_state = 3;
+        reciever_switch_debounce = 0;
+      }
+
+      if (debounce(RECIEVER_SWITCH_PIN, LOW, reciever_switch_debounce)) {
+        main_state = 0;
+        reciever_switch_debounce = 0;
+      }
+      break;
+    }
+    
+    // Playing notes. Wait until it's done or the handle is put down.
+    case 3: {
+      if (debounce(RECIEVER_SWITCH_PIN, LOW, reciever_switch_debounce)) {
+        // Handle is down, stop player NOW.
+        player.stop();
+
+        // Back to IDLE
+        main_state = 0;
+        reciever_switch_debounce = 0;
+        break;
+      }
+
+      if (player.loop()) {
+        // Still playing. Delay 100 ms to avoid querying play state too often.
+        delay(100);
+      }
+      else {
+        // Playing done. Go back to listening for input.
+        main_state = 2;
+        reciever_switch_debounce = 0;
+      }
+      break;
+    }
   }
 }

@@ -6,6 +6,8 @@
 // White wire on rotary thingy
 #define ENABLE_PIN 19
 
+// Also, red is ground.
+
 class Dial {
   public:
   void setup();
