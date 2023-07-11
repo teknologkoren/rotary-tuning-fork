@@ -2,8 +2,6 @@
 
 #include "pins.h"
 
-#define DEBOUNCE_THRESHOLD 3
-
 class Dial {
   public:
   void setup();

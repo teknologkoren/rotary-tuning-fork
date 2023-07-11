@@ -5,3 +5,4 @@
 #define HOSTNAME "rotary-tuning-fork"
 #define HAS_HARDWARE 1
 #define ENABLE_WIFI 1
+#define DEBOUNCE_THRESHOLD 3
