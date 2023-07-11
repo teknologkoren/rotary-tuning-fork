@@ -35,7 +35,7 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   pinMode(RECIEVER_SWITCH_PIN, INPUT_PULLUP);
   delay(2000);
-  // setup_server();
+  setup_server();
   input.setup();
 
   // Setup ringing
