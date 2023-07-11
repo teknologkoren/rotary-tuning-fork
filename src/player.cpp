@@ -12,7 +12,9 @@ void Player::playNotes(char *song_notes[], uint8_t len) {
   Serial.print("Isak will sing: ");
   for (int i = 0; i < len; i++) {
     Serial.print(song_notes[i]);
-    if (i != len-1) {
+    if (i == len-1) {
+      Serial.println();
+    } else {
       Serial.print(", ");
     }
   }

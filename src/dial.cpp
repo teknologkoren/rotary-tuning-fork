@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "config.h"
 #include "dial.h"
+#include "serial_input.h"
 
 bool Dial::debounce(int pin, int state, int &d_var) {
   if (digitalRead(pin) == state) {
@@ -73,8 +74,8 @@ int Dial::loop() {
 
   // If the ESP32 is not connected to the rotary phone hardware, mock the dial
   // with serial input.
-  if (Serial.available() > 0) {
-    return Serial.readStringUntil('\n').toInt();
+  if (hasDigitInput()) {
+    return popDigitInput();
   }
   return -1;
 
