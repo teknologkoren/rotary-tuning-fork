@@ -1,3 +1,5 @@
+#pragma once
+
 #include "dial.h"
 
 class Input {

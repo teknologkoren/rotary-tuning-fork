@@ -1,3 +1,5 @@
+#pragma once
+
 #define RINGER_PIN_A 22
 #define RINGER_PIN_B 23
 

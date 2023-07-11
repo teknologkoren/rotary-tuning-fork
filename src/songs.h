@@ -1,3 +1,5 @@
+#pragma once
+
 typedef struct {
   int page;
   int notes[5];

@@ -1,3 +1,5 @@
+#pragma once
+
 #define DEBOUNCE_THRESHOLD 3
 
 // Blue wire on rotary thingy
