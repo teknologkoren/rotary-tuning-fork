@@ -16,14 +16,14 @@ class Player {
 
   void reset();
 
-  // The array needs to be of length 5
-  void play_notes(int notes[]);
+  // `song_notes` is an array of `len` two-character strings, corresponding to
+  // file names in the DY directory.
+  void playNotes(char *song_notes[], uint8_t len);
+  void playSound(char *path);
 
 
   private:
   DY::Player player;
-  int i = 0;
-  int* notes;
   bool playing = false;
-
+  uint16_t lastSound = 0;
 };

@@ -5,11 +5,29 @@ void Player::setup() {
   player.setVolume(5); // 100% Volume
 }
 
-// The array needs to be of length 5
-void Player::play_notes(int song_notes[]) {
-  notes = song_notes;
-  i = -1;
+// `song_notes` is an array of `len` two-character strings, corresponding to
+// file names in the DY directory.
+void Player::playNotes(char *song_notes[], uint8_t len) {
+  // Debugging output.
+  Serial.print("Isak will sing: ");
+  for (int i = 0; i < len; i++) {
+    Serial.print(song_notes[i]);
+    if (i != len-1) {
+      Serial.print(", ");
+    }
+  }
+
+  player.combinationPlay(song_notes, len);
   playing = true;
+  lastSound = 0;
+}
+
+void Player::playSound(char *path) {
+  Serial.print("Requesting to play ");
+  Serial.println(path);
+  player.playSpecifiedDevicePath(DY::Device::Flash, path);
+  playing = true;
+  lastSound = 0;
 }
 
 // Returns true if still playing
@@ -18,21 +36,20 @@ bool Player::loop() {
     return false;
   }
 
-  // If no longer playing, start playing the next note
   if (!(player.checkPlayState() == DY::PlayState::Playing)) {
-    i++;
-
-    // No more notes, stop playing.
-    if (i >= 5 || *(notes + i) == -1) {
-      playing = false;
-      return false;
-    }
-
-    player.playSpecified(*(notes + i));
-    Serial.print("Isak: ");
-    Serial.println(*(notes + i));
+    playing = false;
+    return false;
   }
 
+  uint16_t currentSound = player.getPlayingSound();
+  if (lastSound != currentSound) {
+    Serial.print("Playing sound: ");
+    Serial.println(currentSound);
+    lastSound = currentSound;
+  }
+
+  // Delay 100 ms to avoid querying play state too often.
+  delay(100);
   return true;
 }
 

@@ -87,7 +87,7 @@ void loop() {
         Serial.println(song);
 
         // Start playin'!
-        player.play_notes(songs[song].notes);
+        player.playNotes(songs[song].notes, songs[song].len);
         main_state = 3;
         reciever_switch_debounce = 0;
       }
@@ -111,11 +111,7 @@ void loop() {
         break;
       }
 
-      if (player.loop()) {
-        // Still playing. Delay 100 ms to avoid querying play state too often.
-        delay(100);
-      }
-      else {
+      if (!player.loop()) {
         // Playing done. Go back to listening for input.
         main_state = 2;
         reciever_switch_debounce = 0;
