@@ -41,47 +41,49 @@ void setup() {
 
 /*
   Main state variable.
-  0 - phone handle down, idle
-  1 - phone handle down, ringing
-  2 - phone handle up, waiting for input
-  3 - phone handle up, playing notes
+  IDLE - phone handle down
+  RINGING - phone handle down, ringing
+  WAITING_FOR_DIAL - phone handle up, waiting for dial input
+  PLAYING - phone handle up, playing sounds
 */
-int main_state = 0;
+enum MainState {IDLE, RINGING, WAITING_FOR_INPUT, PLAYING} mainState;
 
 // HIGH = handle up
 // LOW = handle down
 int reciever_switch_debounce = 0;
 
 void loop() {
-  switch (main_state) {
+  switch (mainState) {
     // Idle state - listen for handle up and network requests.
-    case 0: {
+    case IDLE: {
       if (debounce(RECIEVER_SWITCH_PIN, HIGH, reciever_switch_debounce)) {
-        main_state = 2;
+        mainState = WAITING_FOR_INPUT;
         reciever_switch_debounce = 0;
       }
       break;
     }
 
     // Riiing!!   Riiing!!   Riiing!!
-    case 1: {
+    case RINGING: {
       if (debounce(RECIEVER_SWITCH_PIN, HIGH, reciever_switch_debounce)) {
-        main_state = 2;
+        mainState = WAITING_FOR_INPUT; // TODO implement server input
         reciever_switch_debounce = 0;
       }
       bool ringer_timeout = ringer.loop();
 
       // If ringing timeout reached, go back to idle
       if (!ringer_timeout) {
-        main_state = 2;
+        mainState = IDLE;
         reciever_switch_debounce = 0;
       }
       break;
     }
 
     // Wait for dial input or the handle to be put down again.
-    case 2: {
+    case WAITING_FOR_INPUT: {
       int page = input.loop();
+
+      // If we got a page number, try to play the starting notes.
       if (page != -1) {
         Serial.println();
         Serial.println(page);
@@ -96,32 +98,33 @@ void loop() {
           player.playSound("err.mp3");
         }
 
-        main_state = 3;
+        mainState = PLAYING;
         reciever_switch_debounce = 0;
       }
 
+      // The handle was put down again, return to IDLE.
       if (debounce(RECIEVER_SWITCH_PIN, LOW, reciever_switch_debounce)) {
-        main_state = 0;
+        mainState = IDLE;
         reciever_switch_debounce = 0;
       }
       break;
     }
     
     // Playing notes. Wait until it's done or the handle is put down.
-    case 3: {
+    case PLAYING: {
       if (debounce(RECIEVER_SWITCH_PIN, LOW, reciever_switch_debounce)) {
         // Handle is down, stop player NOW.
         player.stop();
 
         // Back to IDLE
-        main_state = 0;
+        mainState = IDLE;
         reciever_switch_debounce = 0;
         break;
       }
 
       if (!player.loop()) {
         // Playing done. Go back to listening for input.
-        main_state = 2;
+        mainState = WAITING_FOR_INPUT;
         reciever_switch_debounce = 0;
       }
       break;
