@@ -1,7 +1,6 @@
 #pragma once
 
-#define RINGER_PIN_A 22
-#define RINGER_PIN_B 23
+#include "pins.h"
 
 class Ringer {
   public:

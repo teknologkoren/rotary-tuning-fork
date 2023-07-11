@@ -1,14 +1,8 @@
 #pragma once
 
+#include "pins.h"
+
 #define DEBOUNCE_THRESHOLD 3
-
-// Blue wire on rotary thingy
-#define PULSES_PIN 18
-
-// White wire on rotary thingy
-#define ENABLE_PIN 19
-
-// Also, red is ground.
 
 class Dial {
   public:

@@ -2,14 +2,10 @@
 
 #include "input.h"
 #include "player.h"
+#include "ringer.h"
 #include "server.h"
 #include "songs.h"
-#include "ringer.h"
-
-
-#define RECIEVER_SWITCH_PIN 21
-
-#define LED_PIN 17
+#include "pins.h"
 
 Player player;
 Input input;
@@ -32,7 +28,6 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Setting up...");
   // put your setup code here, to run once:
-  pinMode(LED_PIN, OUTPUT);
   pinMode(RECIEVER_SWITCH_PIN, INPUT_PULLUP);
   delay(2000);
   setup_server();
