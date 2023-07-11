@@ -81,13 +81,21 @@ void loop() {
 
     // Wait for dial input or the handle to be put down again.
     case 2: {
-      int song = input.loop();
-      if (song != -1) {
+      int page = input.loop();
+      if (page != -1) {
         Serial.println();
-        Serial.println(song);
+        Serial.println(page);
 
-        // Start playin'!
-        player.playNotes(songs[song].notes, songs[song].len);
+        song_t song = find_song(page);
+
+        if (song.page == page) {
+          // Start playin'!
+          player.playNotes(song.notes, song.len);
+        } else {
+          // Play error message.
+          player.playSound("err.mp3");
+        }
+
         main_state = 3;
         reciever_switch_debounce = 0;
       }

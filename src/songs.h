@@ -10,6 +10,8 @@ typedef struct {
   uint8_t len;
 } song_t;
 
+song_t SONG_NOT_FOUND = {0, {"", "", "", "", ""}, 0};
+
 char *sounds[] = { "01", "02", "03" };
 song_t songs[] = {
   {10, {"C#", "A ", "E ", "A ", ""}, 4},
@@ -99,3 +101,12 @@ song_t songs[] = {
   {96, {"C ", "", "", "", ""}, 1},
   {98, {"C ", "", "", "", ""}, 1}
 };
+
+song_t find_song(int page) {
+  for (int i = 0; i < 86; i++) {
+    if (songs[i].page == page) {
+      return songs[i];
+    }
+  }
+  return SONG_NOT_FOUND;
+}
