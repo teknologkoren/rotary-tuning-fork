@@ -3,3 +3,5 @@
 #define WIFI_SSID "<>"
 #define WIFI_PASSWORD "<>"
 #define HOSTNAME "rotary-tuning-fork"
+#define HAS_HARDWARE 1
+#define ENABLE_WIFI 1

@@ -29,6 +29,8 @@ bool Player::loop() {
     }
 
     player.playSpecified(*(notes + i));
+    Serial.print("Isak: ");
+    Serial.println(*(notes + i));
   }
 
   return true;

@@ -13,6 +13,9 @@ void Ringer::setup() {
 // Returns false when it has been making noise for too long
 // TODO(fix thing)
 bool Ringer::loop() {
+#ifdef HAS_HARDWARE
+  // If the microcontroller is connected to the rotary phone hardware,
+  // ring the ringer for real!
   digitalWrite(RINGER_PIN_A, HIGH);
   digitalWrite(RINGER_PIN_B, LOW);
   delay(25);
@@ -20,4 +23,12 @@ bool Ringer::loop() {
   digitalWrite(RINGER_PIN_A, LOW);
   digitalWrite(RINGER_PIN_B, HIGH);
   delay(25);
+#else
+  // If it is not connected to the rotary phone hardware, mock the ringer
+  // with serial output.
+  Serial.println("R");
+  delay(25);
+  Serial.println("R");
+  delay(25);
+#endif
 }
