@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "config.h"
 #include "ringer.h"
 
 void Ringer::setup() {
@@ -13,7 +14,7 @@ void Ringer::setup() {
 // Returns false when it has been making noise for too long
 // TODO(fix thing)
 bool Ringer::loop() {
-#ifdef HAS_HARDWARE
+#if HAS_HARDWARE
   // If the microcontroller is connected to the rotary phone hardware,
   // ring the ringer for real!
   digitalWrite(RINGER_PIN_A, HIGH);

@@ -1,5 +1,6 @@
 #include <Arduino.h>
 
+#include "config.h"
 #include "input.h"
 #include "player.h"
 #include "ringer.h"
@@ -30,7 +31,11 @@ void setup() {
   // put your setup code here, to run once:
   pinMode(RECIEVER_SWITCH_PIN, INPUT_PULLUP);
   delay(2000);
+
+#if ENABLE_WIFI
   setup_server();
+#endif
+
   input.setup();
 
   // Setup ringing

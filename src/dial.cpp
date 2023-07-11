@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "config.h"
 #include "dial.h"
 
 bool Dial::debounce(int pin, int state, int &d_var) {
@@ -32,7 +33,7 @@ int Dial::get_state() {
 }
 
 int Dial::loop() {
-#ifdef HAS_HARDWARE
+#if HAS_HARDWARE
 
   // If the ESP32 is connected to the rotary phone hardware, read the dial.
   switch(state) {
