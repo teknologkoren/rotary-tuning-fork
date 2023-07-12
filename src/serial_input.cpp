@@ -23,8 +23,9 @@ bool hasCharInput() {
     if (next >= '0' && next <= '9') {
       return false;
     }
+    return true;
   }
-  return true;
+  return false;
 }
 
 char popCharInput() {
