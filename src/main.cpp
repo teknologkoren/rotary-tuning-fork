@@ -60,6 +60,7 @@ void loop() {
       server.startListening();
       if (server.notes_len > 0) {
         server.stopListening();
+        player.putNotes(server.notes, server.notes_len);
         mainState = RINGING;
       }
 
@@ -70,10 +71,10 @@ void loop() {
     case RINGING: {
       if (handleState == HandleState::UP) {
         // Play the notes!
-        player.putNotes(server.notes, server.notes_len);
         player.playNotes();
         server.resetNotes();
         mainState = PLAYING;
+        break;
       }
 
       // If ringing timeout reached, go back to idle
