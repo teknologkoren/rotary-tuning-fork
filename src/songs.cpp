@@ -1,6 +1,6 @@
 #include "songs.h"
 
-song_t SONG_NOT_FOUND = {0, {"", "", "", "", ""}, 0};
+song_t SONG_NOT_FOUND = {-1, {"", "", "", "", ""}, 0};
 song_t songs[] = {
   {10, {"C#", "A ", "E ", "A ", ""}, 4},
   {100, {"C ", "", "", "", ""}, 1},

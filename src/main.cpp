@@ -106,6 +106,10 @@ void loop() {
           // Start playin'!
           player.putNotes(song->notes, song->len);
           player.playNotes();
+        } else if (page == 0 && player.hasNotes()) {
+          // Replay the last notes if the user dialed 0 (and notes have been
+          // played previously).
+          player.playNotes();
         } else {
           // Play error message.
           player.playSound("err.mp3");
