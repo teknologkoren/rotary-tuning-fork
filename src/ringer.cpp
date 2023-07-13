@@ -28,8 +28,9 @@ bool Ringer::loop() {
   // If it is not connected to the rotary phone hardware, mock the ringer
   // with serial output.
   Serial.println("R");
-  delay(25);
+  delay(1000);
   Serial.println("R");
-  delay(25);
+  delay(1000);
 #endif
+  return true;
 }

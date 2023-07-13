@@ -12,5 +12,5 @@ typedef struct {
   uint8_t len;
 } song_t;
 
-song_t find_song(int page);
+song_t* find_song(int page);
 

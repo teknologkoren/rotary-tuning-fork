@@ -7,19 +7,33 @@ void Player::setup() {
 
 // `song_notes` is an array of `len` two-character strings, corresponding to
 // file names in the DY directory.
-void Player::playNotes(char *song_notes[], uint8_t len) {
+void Player::putNotes(char *song_notes[], uint8_t len) {
+  for (int i = 0; i < len; i++) {
+    notes[i] = song_notes[i];
+  }
+  n_notes = len;
+}
+
+void Player::putNotes(char song_notes[][3], uint8_t len) {
+  for (int i = 0; i < len; i++) {
+    notes[i] = song_notes[i];
+  }
+  n_notes = len;
+}
+
+void Player::playNotes() {
   // Debugging output.
   Serial.print("Isak will sing: ");
-  for (int i = 0; i < len; i++) {
-    Serial.print(song_notes[i]);
-    if (i == len-1) {
+  for (int i = 0; i < n_notes; i++) {
+    Serial.print(notes[i]);
+    if (i == n_notes-1) {
       Serial.println();
     } else {
       Serial.print(", ");
     }
   }
 
-  player.combinationPlay(song_notes, len);
+  player.combinationPlay(notes, n_notes);
   playing = true;
   lastSound = 0;
 }
@@ -60,4 +74,8 @@ void Player::stop() {
     player.stop();
   }
   playing = false;
+}
+
+bool Player::hasNotes() {
+  return n_notes > 0;
 }

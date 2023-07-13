@@ -1,33 +1,15 @@
 #include <Arduino.h>
 
-// Only include wifi code if running on ESP32.
-#if defined(ESP32)
-
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <ArduinoJson.h>
 
 #include "config.h"
+#include "server.h"
 
-AsyncWebServer server(80);
-
-void setup_server() {
-  // Connect Wifi, restart if not connecting
-  // https://techoverflow.net/2021/01/21/how-to-fix-esp32-not-connecting-to-the-wifi-network/
+void WebServer::setup() {
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   WiFi.setHostname(HOSTNAME);
-  uint32_t notConnectedCounter = 0;
-  while (WiFi.status() != WL_CONNECTED) {
-      delay(100);
-      Serial.println("Wifi connecting...");
-      notConnectedCounter++;
-      if(notConnectedCounter > 50) { // Reset board if not connected after 5s
-          Serial.println("Resetting due to Wifi not connecting...");
-          ESP.restart();
-      }
-  }
-  Serial.print("Wifi connected, IP address: ");
-  Serial.println(WiFi.localIP());
 
   // Initialize webserver URLs
   server.on("/api/wifi-info", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -40,17 +22,66 @@ void setup_server() {
       request->send(response);
   });
 
-  server.on("/api/play-notes", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/api/play-notes", HTTP_GET, [this](AsyncWebServerRequest *request) {
     AsyncResponseStream *response =
         request->beginResponseStream("application/json");
     DynamicJsonDocument json(1024);
 
-    if (request->hasParam("notes")) {
+    if (!listening) {
+      json["status"] = "busy";
+      Serial.println("Got a call, but the phone was in use.");
+    }
+    else if (request->hasParam("notes")) {
       AsyncWebParameter *p = request->getParam("notes");
-      json["status"] = "ok";
+      Serial.print("Got notes from call: ");
       Serial.println(p->value());
+      bool success = true;
+
+      unsigned int str_len = p->value().length();
+      for (int i = 0; i < str_len; i++) {
+        char ch1 = p->value()[i];
+
+        if (ch1 == ',') {
+          continue;
+        }
+
+        if (notes_len >= 20) {
+          // Too long
+          success = false;
+          break;
+        }
+
+        if (ch1 < 'A' || ch1 > 'G') {
+          // Invalid note.
+          success = false;
+          break;
+        }
+
+        char ch2;
+        if (i+1 == str_len || p->value()[i+1] == ',') {
+          ch2 = ' ';
+        } else {
+          ch2 = p->value()[++i];
+          if (ch2 != '#' && ch2 != 'b') {
+            // Invalid accidental
+            success = false;
+            break;
+          }
+        }
+
+        notes[notes_len][0] = ch1;
+        notes[notes_len][1] = ch2;
+        notes[notes_len][2] = 0;
+        notes_len++;
+      }
+
+      if (success) {
+        json["status"] = "ok";
+      } else {
+        json["status"] = "malformed";
+      }
     } else {
-      json["status"] = "failure";
+      json["status"] = "malformed";
       Serial.println("Did not get notes to play.");
     }
 
@@ -62,9 +93,39 @@ void setup_server() {
   server.begin();
 }
 
-#else
-// Replace setup_server with a dummy if not running on ESP32.
-void setup_server() {
-    Serial.println("Web server only supported on ESP32.");
+void WebServer::startListening() {
+  listening = true;
 }
-#endif
+
+void WebServer::stopListening() {
+  listening = false;
+}
+
+void WebServer::loop() {
+  // Only check if we're connected once a second.
+  if (millis() - lastConnectionCheck < 1000) {
+    return;
+  }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    if (lastConnected == 0 || notConnectedCounter > 0) {
+      Serial.print("Wifi connected, IP address: ");
+      Serial.println(WiFi.localIP());
+    }
+    notConnectedCounter = 0;
+    lastConnected = millis();
+  } else {
+    Serial.println("Wifi connecting...");
+    notConnectedCounter++;
+    if (notConnectedCounter > 50) {  // Reset board if not connected after 50s
+      Serial.println("Resetting due to Wifi not connecting...");
+      ESP.restart();
+    }
+  }
+
+  lastConnectionCheck = millis();
+}
+
+void WebServer::resetNotes() {
+  notes_len = 0;
+}

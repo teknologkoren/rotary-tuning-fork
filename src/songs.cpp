@@ -90,11 +90,11 @@ song_t songs[] = {
   {98, {"C ", "", "", "", ""}, 1}
 };
 
-song_t find_song(int page) {
+song_t* find_song(int page) {
   for (int i = 0; i < 86; i++) {
     if (songs[i].page == page) {
-      return songs[i];
+      return &songs[i];
     }
   }
-  return SONG_NOT_FOUND;
+  return &SONG_NOT_FOUND;
 }
