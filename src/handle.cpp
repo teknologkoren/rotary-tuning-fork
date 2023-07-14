@@ -26,10 +26,12 @@ handle_state_t Handle::loop() {
     // If we have hardware, read the state of the reciever switch.
     if (settled_state == HandleState::DOWN) {
       if (debounce(RECIEVER_SWITCH_PIN, HandleState::UP, debounce_var)) {
+        Serial.println("Handle up!");
         settled_state = HandleState::UP;
       }
     } else if (settled_state == HandleState::UP) {
       if (debounce(RECIEVER_SWITCH_PIN, HandleState::DOWN, debounce_var)) {
+        Serial.println("Handle down!");
         settled_state = HandleState::DOWN;
       }
     }

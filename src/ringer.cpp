@@ -12,25 +12,44 @@ void Ringer::setup() {
 }
 
 // Returns false when it has been making noise for too long
-// TODO(fix thing)
 bool Ringer::loop() {
-#if HAS_HARDWARE
-  // If the microcontroller is connected to the rotary phone hardware,
-  // ring the ringer for real!
-  digitalWrite(RINGER_PIN_A, HIGH);
-  digitalWrite(RINGER_PIN_B, LOW);
-  delay(25);
+  if (count >= 120*4) {
+    Serial.println("\nCall timed out.");
+    reset();
+    return false;
+  }
 
-  digitalWrite(RINGER_PIN_A, LOW);
-  digitalWrite(RINGER_PIN_B, HIGH);
-  delay(25);
-#else
-  // If it is not connected to the rotary phone hardware, mock the ringer
-  // with serial output.
-  Serial.println("R");
-  delay(1000);
-  Serial.println("R");
-  delay(1000);
-#endif
+  int a = count % 120;
+  if (a < 40) {
+    // Ring for ~2s.
+    if (HAS_HARDWARE) {
+      // If the microcontroller is connected to the rotary phone hardware,
+      // ring the ringer for real!
+      digitalWrite(RINGER_PIN_A, HIGH);
+      digitalWrite(RINGER_PIN_B, LOW);
+      delay(25);
+
+      digitalWrite(RINGER_PIN_A, LOW);
+      digitalWrite(RINGER_PIN_B, HIGH);
+      delay(25);
+    } else {
+      // If it is not connected to the rotary phone hardware, mock the ringer
+      // with serial output.
+      Serial.print("R");
+      delay(25);
+      delay(25);
+    }
+  } else {
+    // Silence for ~4s.
+    delay(50);
+  }
+
+  count++;
   return true;
+}
+
+void Ringer::reset() {
+  count = 0;
+  digitalWrite(RINGER_PIN_A, LOW);
+  digitalWrite(RINGER_PIN_B, LOW);
 }

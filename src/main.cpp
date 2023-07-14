@@ -72,6 +72,7 @@ void loop() {
       if (handleState == HandleState::UP) {
         // Play the notes!
         player.playNotes();
+        ringer.reset();
         server.resetNotes();
         mainState = PLAYING;
         break;
@@ -80,6 +81,7 @@ void loop() {
       // If ringing timeout reached, go back to idle
       bool ringer_timeout = ringer.loop();
       if (!ringer_timeout) {
+        ringer.reset();
         server.resetNotes();
         mainState = IDLE;
       }
