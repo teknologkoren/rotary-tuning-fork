@@ -34,8 +34,6 @@ int Dial::get_state() {
 }
 
 int Dial::loop() {
-#if HAS_HARDWARE
-
   // If the ESP32 is connected to the rotary phone hardware, read the dial.
   switch(state) {
     case 0:
@@ -70,14 +68,11 @@ int Dial::loop() {
   }
   delay(1);
 
-#else
-
-  // If the ESP32 is not connected to the rotary phone hardware, mock the dial
-  // with serial input.
+  // In case the ESP32 is not connected to the rotary phone hardware, mock the
+  // dial with serial input.
   if (hasDigitInput()) {
     return popDigitInput();
   }
   return -1;
 
-#endif
 }
