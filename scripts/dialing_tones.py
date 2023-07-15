@@ -1,3 +1,4 @@
+import itertools
 import wave
 import struct
 import math
@@ -16,9 +17,12 @@ def phase_to_amplitude(phase):
 def write_tone(f, phase, frequency, duration):
   phase_step = 2 * math.pi * frequency / SAMPLE_RATE
   frame = bytearray()
+  desired_n_frames = round(SAMPLE_RATE * duration)
 
-  for _ in range(round(SAMPLE_RATE * duration)):
+  for i in itertools.count():
     phase += phase_step
+    if phase > math.pi * 2:
+      phase -= math.pi * 2
     amplitude = phase_to_amplitude(phase)
 
     # Interpret the amplitude as a signed short (int16), pack it in little-endian,
@@ -27,6 +31,11 @@ def write_tone(f, phase, frequency, duration):
 
     frame.append(b1)  # Left channel first byte
     frame.append(b2)  # Left channel second byte
+
+    if i >= desired_n_frames:
+      if abs(amplitude) < 1:
+        print(f"Got {i - desired_n_frames} frames extra.")
+        break
 
   f.writeframes(frame)
   return phase
@@ -49,7 +58,7 @@ def write_signal(name, tones):
       phase = write_tone(f, phase, frequency, duration)
   
   stream = ffmpeg.input(f"wav/{name}.wav")
-  stream = ffmpeg.output(stream, f"mp3/{name}.mp3", acodec="mp3")
+  stream = ffmpeg.output(stream, f"mp3/{name}.mp3", acodec="mp3", loglevel="quiet")
   ffmpeg.run(stream)
 
 
