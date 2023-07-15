@@ -67,15 +67,18 @@ def write_signal(name, tones):
 # Generally, the Swedish variants have been chosen for maximal familiarity.
 
 # Tone that plays while waiting for number input.
-write_signal("dial", ((425, 5),))
+write_signal("dial", ((425, 30),))
 
-# Tone that plays while the call is ringing. Do two periods so you can
-# hear it properly.
+# Tone that plays while the call is ringing.
 write_signal("ringing", (
   (425, 1),
   (0, 4),
   (425, 1),
   (0, 4),
+  ))
+write_signal("ringing_once", (
+  (425, 1),
+  (0, 1),
   ))
 
 # Tone that plays if the number was busy. Do four periods so you can
@@ -103,12 +106,8 @@ write_signal("busy_std", (
   (0, 0.5),
   ))
 
-# Special information signal. Play it twice for good measure and demo purposes.
+# Special information signal.
 write_signal("special_information", (
-  (950, 0.33),
-  (1400, 0.33),
-  (1800, 0.33),
-  (0, 1),
   (950, 0.33),
   (1400, 0.33),
   (1800, 0.33),
