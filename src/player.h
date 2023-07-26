@@ -18,7 +18,7 @@ class Player {
 
   // `song_notes` is an array of `len` two-character strings, corresponding to
   // file names in the DY directory.
-  void playNotes();
+  void playNotes(bool skip_ring);
   void putNotes(char *song_notes[], uint8_t len);
   void putNotes(char song_notes[][3], uint8_t len);
   void playSound(char *path);

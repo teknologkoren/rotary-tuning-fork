@@ -23,6 +23,7 @@ Input input;
 Player player;
 Ringer ringer;
 WebServer server;
+bool already_played = false;
 
 void setup() {
   Serial.begin(115200);
@@ -41,7 +42,7 @@ void setup() {
 }
 
 void loop() {
-  if (ENABLE_WIFI) {
+  if (ENABLE_WIFI && mainState != MainState::RINGING) {
     server.loop();
   }
 
@@ -54,6 +55,7 @@ void loop() {
         // The phone handle was lifted, start waiting for dial input.
         mainState = WAITING_FOR_INPUT;
         server.stopListening();
+        player.playSound("/ZH/DT.mp3");
         break;
       }
 
@@ -71,7 +73,8 @@ void loop() {
     case RINGING: {
       if (handleState == HandleState::UP) {
         // Play the notes!
-        player.playNotes();
+        delay(1100);
+        player.playNotes(/* skip_ring= */ true);
         ringer.reset();
         server.resetNotes();
         mainState = PLAYING;
@@ -94,7 +97,14 @@ void loop() {
       if (handleState == HandleState::DOWN) {
         // The handle was put down again, return to IDLE.
         mainState = IDLE;
+        already_played = false;
+        player.stop();
         break;
+      }
+
+      // If we are inputting something, stop playing dial tone.
+      if (input.get_dial_state() != 0) {
+        player.stop();
       }
 
       // If we got a page number, try to play the starting notes.
@@ -108,14 +118,16 @@ void loop() {
         if (song->page == page) {
           // Start playin'!
           player.putNotes(song->notes, song->len);
-          player.playNotes();
+          player.playNotes(/* skip_ring= */ false);
+          already_played = true;
         } else if (page == 0 && player.hasNotes()) {
           // Replay the last notes if the user dialed 0 (and notes have been
           // played previously).
-          player.playNotes();
+          player.playNotes(/* skip_ring= */ already_played);
+          already_played = true;
         } else {
           // Play error message.
-          player.playSound("err.mp3");
+          player.playSound("/ZH/LW.mp3");
         }
 
         mainState = PLAYING;
@@ -130,6 +142,7 @@ void loop() {
         // Handle is down, stop playing sounds and go back to IDLE.
         player.stop();
         mainState = IDLE;
+        already_played = false;
         break;
       }
 

@@ -7,6 +7,7 @@ class Input {
   void setup();
   int loop();
   void reset();
+  int get_dial_state();
 
   private:
   Dial dial;

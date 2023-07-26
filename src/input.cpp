@@ -38,3 +38,7 @@ int Input::loop() {
   }
   return -1;
 }
+
+int Input::get_dial_state() {
+  return dial.get_state();
+}
