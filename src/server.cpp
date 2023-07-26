@@ -59,10 +59,14 @@ void WebServer::setup() {
 
         char ch2;
         if (i+1 == str_len || p->value()[i+1] == ',') {
-          ch2 = ' ';
+          ch2 = ch1;
         } else {
           ch2 = p->value()[++i];
-          if (ch2 != '#' && ch2 != 'b') {
+          if (ch2 == '#') {
+            ch2 = 'S';
+          } else if (ch2 == 'b') {
+            ch2 = 'F';
+          } else {
             // Invalid accidental
             success = false;
             break;
